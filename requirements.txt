@@ -3,5 +3,6 @@ dash-bootstrap-components==1.6.0
 plotly==5.24.1
 pandas==2.2.3
 numpy==2.1.2
+scikit-learn==1.5.2 
 openpyxl
 gunicorn
