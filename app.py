@@ -47,8 +47,9 @@ app.layout = html.Div([
     ], style={'margin': '20px 40px'}),
 
     html.Div([
-        dcc.Graph(id='player-weekly-bar', style={'marginBottom': '40px','width': '48%', 'display': 'inline-block'}),
-        dcc.Graph(id='teams-yds', style={'marginBottom': '40px','width': '48%', 'display': 'inline-block'}),
+        dcc.Graph(id='player-weekly-bar', style={'marginBottom': '40px','width': '32%', 'display': 'inline-block'}),
+        dcc.Graph(id='teams-yds', style={'marginBottom': '40px','width': '32%', 'display': 'inline-block'}),
+        dcc.Graph(id='points-diff-hist', style={'marginBottom': '40px','width': '32%', 'display': 'inline-block'}),
         dcc.Graph(id='position-scatter', style={'marginBottom': '40px','width': '48%', 'display': 'inline-block'}),
         dcc.Graph(id='adp-vs-score', style={'marginBottom': '40px','width': '48%', 'display': 'inline-block'})
     ], style={'padding': '0 40px'})
