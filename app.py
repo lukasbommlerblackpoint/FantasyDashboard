@@ -2,7 +2,7 @@ import dash
 from dash import dcc, html, Input, Output
 import plotly.express as px
 import pandas as pd
-from sklearn.linear_model import LinearRegression
+# from sklearn.linear_model import LinearRegression
 
 df_players = pd.read_excel('df_players.xlsx').drop(columns='Unnamed: 0')
 df_players = df_players[~(df_players.overallADP==0)]
@@ -12,6 +12,7 @@ df_teams = pd.read_excel('df_teams.xlsx').drop(columns='Unnamed: 0')
 # -------------------------
 app = dash.Dash(__name__)
 app.title = "Fantasy Football Dashboard"
+server = app.server
 
 # -------------------------
 # Layout
@@ -89,37 +90,37 @@ def update_chart_style(fig, title):
     )
     return fig
 
-def add_regression_line(fig, df, x_col, y_col, color='red'):
-    # Remove rows with NaN
-    df_clean = df[[x_col, y_col]].dropna()
-    if len(df_clean) < 2:
-        return fig  # Not enough points for regression
+# def add_regression_line(fig, df, x_col, y_col, color='red'):
+#     # Remove rows with NaN
+#     df_clean = df[[x_col, y_col]].dropna()
+#     if len(df_clean) < 2:
+#         return fig  # Not enough points for regression
 
-    X = df_clean[[x_col]].values
-    y = df_clean[y_col].values
+#     X = df_clean[[x_col]].values
+#     y = df_clean[y_col].values
 
-    model = LinearRegression()
-    model.fit(X, y)
-    y_pred = model.predict(X)
-    r2 = model.score(X, y)
+#     model = LinearRegression()
+#     model.fit(X, y)
+#     y_pred = model.predict(X)
+#     r2 = model.score(X, y)
 
-    # Add regression line
-    fig.add_traces(px.line(
-        x=df_clean[x_col],
-        y=y_pred,
-        labels={x_col: x_col, y_col: y_col}
-    ).data)
+#     # Add regression line
+#     fig.add_traces(px.line(
+#         x=df_clean[x_col],
+#         y=y_pred,
+#         labels={x_col: x_col, y_col: y_col}
+#     ).data)
 
-    # Add R^2 annotation
-    fig.add_annotation(
-        xref='paper', yref='paper',
-        x=0.95, y=0.95,
-        text=f"R² = {r2:.3f}",
-        showarrow=False,
-        font=dict(color=color, size=14),
-        align='right'
-    )
-    return fig
+#     # Add R^2 annotation
+#     fig.add_annotation(
+#         xref='paper', yref='paper',
+#         x=0.95, y=0.95,
+#         text=f"R² = {r2:.3f}",
+#         showarrow=False,
+#         font=dict(color=color, size=14),
+#         align='right'
+#     )
+#     return fig
 
 # Bar chart for selected player
 @app.callback(
@@ -164,7 +165,7 @@ def update_position_scatter(week):
         color_discrete_sequence=px.colors.qualitative.Plotly
     )
     fig = update_chart_style(fig, f"Projected vs Scored Points (week: {week})")
-    fig = add_regression_line(fig, df_pos, 'projected_points', 'scored_points', color='gray')
+    # fig = add_regression_line(fig, df_pos, 'projected_points', 'scored_points', color='gray')
     return fig
 
 # Scatter: ADP vs Scored Points (all players)
@@ -192,7 +193,7 @@ def update_adp_vs_score(week):
         color_discrete_sequence=px.colors.qualitative.Plotly
     )
     fig = update_chart_style(fig, f"Scored Points vs Average Draft Nr (week: {week})")
-    fig = add_regression_line(fig, df_pos, 'overallADP', 'scored_points', color='gray')
+    # fig = add_regression_line(fig, df_pos, 'overallADP', 'scored_points', color='gray')
     return fig
 
 # Scatter: ADP vs Scored Points (all players)
@@ -213,6 +214,34 @@ def update_teams_yds(weeks):
         color_discrete_sequence=px.colors.qualitative.Plotly
     )
     fig = update_chart_style(fig, f"Rushing vs Receiving Yards per Team (Size ~ #TD)")
+    return fig
+
+
+@app.callback(
+    Output('points-diff-hist', 'figure'),
+    Input('week-dropdown', 'value')
+)
+def update_points_diff_hist(week):
+    df_diff = df_players if week in ('All', 'Sum') else df_players[df_players['week'] == week]
+    df_diff = df_diff[df_diff['projected_points'] != 0]
+    if week == 'Sum':
+        df_diff = df_diff.groupby(
+            ['playerID', 'Name', 'Position', 'Team', 'overallADP'], as_index=False
+        ).agg({
+            'projected_points': 'sum',
+            'scored_points': 'sum'
+        })
+        df_diff['week'] = week
+
+    # Compute difference
+    df_diff['points_diff'] = df_diff['scored_points'] - df_diff['projected_points']
+    # Build histogram
+    fig = px.histogram(
+        df_diff,
+        x='points_diff',
+        nbins=100
+    )
+    fig = update_chart_style(fig, "Difference Between Scored and Projected Points (Players)")
     return fig
 
 
