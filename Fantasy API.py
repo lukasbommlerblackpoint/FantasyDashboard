@@ -134,17 +134,3 @@ df_teams = pd.DataFrame(rows)
 numeric_cols = ['wins', 'rushYds', 'rushTD', 'carries', 'receptions', 'recTD', 'targets', 'recYds']
 df_teams[numeric_cols] = df_teams[numeric_cols].apply(pd.to_numeric, errors='coerce')
 df_teams.to_excel('df_teams.xlsx')
-
-
-df_teams['bubble_size'] = (df_teams['rushTD'] + df_teams['recTD']) * 20 
-fig, ax = plt.subplots(figsize=(10, 6))
-ax.scatter(df_teams['rushYds'], df_teams['recYds'], s=df_teams['bubble_size'], alpha=0.6)
-for i, row in df_teams.iterrows():
-    ax.text(row['rushYds'] + 10, row['recYds'], row['teamAbv'], fontsize=9, weight='bold')
-ax.set_title('Team Rushing vs Receiving Yards (Bubble Size = Total TDs)', fontsize=14)
-ax.set_xlabel('Rushing Yards', fontsize=12)
-ax.set_ylabel('Receiving Yards', fontsize=12)
-ax.grid(True, linestyle='--', alpha=0.6)
-plt.tight_layout()
-
-

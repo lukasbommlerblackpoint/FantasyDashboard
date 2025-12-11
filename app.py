@@ -148,7 +148,9 @@ def update_player_weekly(player_name):
 )
 def update_position_scatter(week):
     df_pos = df_players if week in ('All', 'Sum') else df_players[df_players['week'] == week]
-    if week == 'Sum':
+    if week == 'All':
+        df_pos = df_pos[df_pos['projected_points'] != 0]
+    elif week == 'Sum':
         df_pos = df_pos.groupby(
             ['playerID', 'Name', 'Position', 'Team', 'overallADP'], as_index=False
         ).agg({
@@ -176,7 +178,9 @@ def update_position_scatter(week):
 )
 def update_adp_vs_score(week):
     df_pos = df_players if week in ('All', 'Sum') else df_players[df_players['week'] == week]
-    if week == 'Sum':
+    if week == 'All':
+        df_pos = df_pos[df_pos['projected_points'] != 0]
+    elif week == 'Sum':
         df_pos = df_pos.groupby(
             ['playerID', 'Name', 'Position', 'Team', 'overallADP'], as_index=False
         ).agg({
