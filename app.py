@@ -11,14 +11,14 @@ df_teams = pd.read_excel('df_teams.xlsx').drop(columns='Unnamed: 0')
 # Initialize Dash App
 # -------------------------
 app = dash.Dash(__name__)
-app.title = "Fantasy Football Dashboard"
+app.title = "Lukas sein Fantasy Dashboard"
 server = app.server
 
 # -------------------------
 # Layout
 # -------------------------
 app.layout = html.Div([
-    html.H1("🏈 Fantasy Football Dashboard", 
+    html.H1("🏈 Lukas sein Fantasy Dashboard", 
             style={'textAlign': 'center', 'marginBottom': '30px'}),
 
     html.Div([
